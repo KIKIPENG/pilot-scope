@@ -1,6 +1,6 @@
 # pilot-scope 設計
 
-日期:2026-09-24 · 狀態:待使用者審閱
+日期:2026-09-24 · 狀態:已實作
 
 ## 目的
 
@@ -9,7 +9,7 @@ pilot-scope 是一個**個人學習 / 探索用**的本機小工具:用點擊發
 直觀感受 **channel(音色)/ 音高 / 力度(大小聲)/ 音長** 的差別,
 並把每個聲音對應到「在 Orca 裡怎麼寫」,讓試聽變成寫 Orca 的能力。
 
-非目標:演出視覺、接收 Orca 的輸出、錄音 / 存檔、調整 Pilot 音色參數(osc/env/效果)、和弦。
+非目標:演出視覺、接收 Orca 的輸出、錄音 / 存檔、和弦。
 
 ## Pilot 訊息格式(已對照 `/Applications/Pilot.app/…/sources/scripts/interface.channel.js` 確認)
 
@@ -26,7 +26,7 @@ UDP 送到 `127.0.0.1:49161`,訊息為 ASCII 字串:
 - 例:`04Cf8` = channel 0 · 第 4 八度 · C · 力度 f(最大)· 音長 8。
 - Orca 寫法 = 前面加 UDP 運算子 `;`,即 `;04Cf8`。
 - Pilot 對**同一 channel** 在 100ms 內的第二個音會忽略(UI 不需處理,但 README 註明,以免誤判為 bug)。
-- Pilot 預設每個 channel 音色不同(`mixer.js` 的 reset preset,如 0 = sine、1 = sawtooth…),UI 在 channel 格子上以小字標示預設波形,幫助理解「channel = 音色」。使用者若在 Pilot 內改過音色,標示會不準,README 註明。
+- Pilot 預設每個 channel 音色不同(`mixer.js` 的 reset preset:0–5 = AM、6–9 = FM、a–b = Mono、c–f = 鼓(Membrane),各有不同波形,如 0 = sine8、1 = triangle8),UI 在 channel 格子上以小字標示預設波形,幫助理解「channel = 音色」。使用者若在 Pilot 內改過音色,標示會不準,README 註明。
 
 ## 架構
 
@@ -81,3 +81,11 @@ pilot-scope/
 - `parser`:TDD。涵蓋 16 個 channel、八度邊界 0/8、升記號大小寫、力度 / 音長邊界與省略、非法值、`format`↔`parse` 來回一致。
 - `server`:整合測試——起 server 指向測試用假 UDP 接收端,經 WebSocket 送字串,驗證 UDP 收到內容正確;送非法字串時 UDP 不收到且 WebSocket 回錯誤。
 - UI:開發者以瀏覽器實際點擊驗證;最終「聽起來對不對」由使用者開 Pilot 真機試聽確認。
+
+## 後續加入(2026-10-01)
+
+- **瀏覽器發聲**:用 Tone.js 照 Pilot `mixer.js` 的預設音色模擬,可放到 Netlify 等靜態空間;本機連上 server 時預設送到 Pilot。
+- **桌面 app**:Electron 包裝,在 app 內用隨機 port 啟動同一個 server(`electron/main.js`)。
+- **音色設定與效果器**:ENV、OSC、12 個效果器、reset(`public/commands.js`、`public/settings.js`)。
+  對照 Pilot 原始碼:EQU/COM/VOL/LIM 沒作用所以不列;效果數值要小寫;ENV 對 channel c–f 無效;
+  Pilot 同項目 100ms 內的設定會被忽略,所以 UI 以 120ms 節流並保證送出最後一個值。

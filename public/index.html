@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pilot-scope</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>pilot-scope</h1>
+    <span class="output" role="group" aria-label="發聲方式">
+      <button id="out-browser">瀏覽器發聲</button><button id="out-pilot" disabled>送到 Pilot</button>
+    </span>
+    <span id="status" class="status off">Pilot 未連線</span>
+    <span id="hint" class="hint"></span>
+  </header>
+
+  <section>
+    <h2>channel <small>= 音色。點一格選它,之後彈的音都用這個樂器</small></h2>
+    <div id="channels" class="channels"></div>
+  </section>
+
+  <section>
+    <h2>piano roll <small>最近 20 秒 · 越高 = 音越高 · 顏色 = channel · 越淡 = 越小聲 · 越長 = 音越長</small></h2>
+    <canvas id="roll"></canvas>
+  </section>
+
+  <section>
+    <h2>試聽台</h2>
+    <div class="controls">
+      <label>八度
+        <span class="stepper">
+          <button id="oct-down" title="降八度(Z)">−</button>
+          <output id="octave"></output>
+          <button id="oct-up" title="升八度(X)">+</button>
+        </span>
+      </label>
+      <label>力度(大小聲)
+        <input id="velocity" type="range" min="1" max="15" step="1">
+        <output id="velocity-out"></output>
+      </label>
+      <label>音長
+        <input id="length" type="range" min="0" max="15" step="1">
+        <output id="length-out"></output>
+      </label>
+    </div>
+    <div id="keyboard" class="keyboard"></div>
+    <p class="keys-hint">電腦鍵盤:<kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd><kbd>H</kbd><kbd>J</kbd><kbd>K</kbd> 白鍵 · <kbd>W</kbd><kbd>E</kbd><kbd>T</kbd><kbd>Y</kbd><kbd>U</kbd> 黑鍵 · <kbd>Z</kbd>/<kbd>X</kbd> 降/升八度</p>
+  </section>
+
+  <section>
+    <h2>音色設定 <small>選中的 channel 的聲音長相。改了以後,彈這個 channel 都會是新的聲音</small></h2>
+    <div id="voice" class="voice"></div>
+  </section>
+
+  <section>
+    <h2>效果器 <small>全部 channel 共用,聲音最後都會經過這些效果。預設全部關著(wet 0)</small></h2>
+    <div id="effects" class="effects"></div>
+    <p><button id="reset" class="reset">全部重設</button> <small class="dim">包絡、波形、效果器都回到 Pilot 預設 · Orca 寫法 <code>;reset</code></small></p>
+  </section>
+
+  <section>
+    <h2>Orca 寫法 <small>在 Orca 裡打這幾串,就能做出一樣的聲音。開頭的 <code>;</code> 是 Orca 的 UDP 運算子,會把後面的字送到 port 49161(Pilot)</small></h2>
+    <div id="orca" class="orca-grid"></div>
+    <p id="error" class="error" hidden></p>
+  </section>
+
+  <script src="vendor/Tone.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

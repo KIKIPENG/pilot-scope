@@ -1,0 +1,72 @@
+{
+  "name": "pilot-scope",
+  "version": "0.1.0",
+  "private": true,
+  "description": "點擊發聲、學習 Pilot 訊息格式與 Orca 寫法的本機小工具",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "vitest run",
+    "vendor": "cp node_modules/tone/build/Tone.js node_modules/tone/build/Tone.js.LICENSE.txt public/vendor/",
+    "app": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "dist": "electron-builder --mac --win"
+  },
+  "dependencies": {
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
+    "tone": "^15.1.22",
+    "vitest": "^5.0.1"
+  },
+  "main": "electron/main.js",
+  "author": "kaichess",
+  "build": {
+    "appId": "local.pilot-scope",
+    "productName": "pilot-scope",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**",
+      "server.js",
+      "public/**",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.music"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signExecutable": false
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-win.exe"
+    },
+    "dmg": {
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
+    }
+  }
+}
